@@ -171,7 +171,7 @@ def get_chair_search():
     chairs = select_all(query, params + [per_page, per_page * page])
     camelized = camelize(chairs)
 
-    return {"count": len(camelize), "chairs": camelized}
+    return {"count": len(camelized), "chairs": camelized}
 
 
 @app.route("/api/chair/search/condition", methods=["GET"])
@@ -377,7 +377,10 @@ def get_recommended_estate(chair_id):
         " ORDER BY popularity DESC, id ASC"
         " LIMIT %s"
     )
-    estates = select_all(query, (w, h, w, d, h, w, h, d, d, w, d, h, LIMIT))
+    estates = select_all(query, (w, h, w, d,
+                                 h, w, h, d,
+                                 d, w, d, h,
+                                 LIMIT))
     return {"estates": camelize(estates)}
 
 
