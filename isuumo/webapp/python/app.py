@@ -170,7 +170,7 @@ def get_chair_search():
 
     search_condition = " AND ".join(conditions)
 
-    query = f"SELECT * FROM chair WHERE {search_condition} ORDER BY negative_popularity ASC, id ASC LIMIT %s OFFSET %s"
+    query = f"SELECT * FROM chair WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
     chairs = select_all(query, params + [per_page, per_page * page])
     camelized = camelize(chairs)
     count = len(camelized)
@@ -283,7 +283,7 @@ def get_estate_search():
 
     search_condition = " AND ".join(conditions)
 
-    query = f"SELECT * FROM estate WHERE {search_condition} ORDER BY negative_popularity ASC, id ASC LIMIT %s OFFSET %s"
+    query = f"SELECT * FROM estate WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
     estates = select_all(query, params + [per_page, per_page * page])
     camelized = camelize(estates)
     count = len(camelized)
@@ -328,7 +328,7 @@ def post_estate_nazotte():
             (
                 "SELECT * FROM estate"
                 " WHERE latitude <= %s AND latitude >= %s AND longitude <= %s AND longitude >= %s"
-                " ORDER BY negative_popularity ASC, id ASC"
+                " ORDER BY popularity DESC, id ASC"
             ),
             (
                 bounding_box["bottom_right_corner"]["latitude"],
@@ -378,14 +378,14 @@ def get_recommended_estate(chair_id):
         "SELECT * FROM estate"
         " WHERE (door_width >= %s AND door_height >= %s)"
         "    OR (door_width >= %s AND door_height >= %s)"
-        " ORDER BY negative_popularity ASC, id ASC"
+        " ORDER BY popularity DESC, id ASC"
         " LIMIT %s"
     )
     query = (
         "SELECT * FROM estate"
         " WHERE (door_width >= %s AND door_height >= %s)"
         "    OR (door_width >= %s AND door_height >= %s)"
-        " ORDER BY negative_popularity ASC, id ASC"
+        " ORDER BY popularity DESC, id ASC"
         " LIMIT %s"
     )
     a, b, _ = sorted([w, h, d])
@@ -404,8 +404,8 @@ def post_chair():
         cnx.start_transaction()
         cur = cnx.cursor()
         for record in records:
-            query = "INSERT INTO chair(id, name, description, thumbnail, price, height, width, depth, color, features, kind, popularity, stock, negative_popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            cur.execute(query, record + [-1 * int(record[-2]), ])
+            query = "INSERT INTO chair(id, name, description, thumbnail, price, height, width, depth, color, features, kind, popularity, stock) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            cur.execute(query, record)
         cnx.commit()
         return {"ok": True}, 201
     except Exception as e:
@@ -425,8 +425,8 @@ def post_estate():
         cnx.start_transaction()
         cur = cnx.cursor()
         for record in records:
-            query = "INSERT INTO estate(id, name, description, thumbnail, address, latitude, longitude, rent, door_height, door_width, features, popularity, negative_popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            cur.execute(query, record + [-1 * int(record[-1]), ])
+            query = "INSERT INTO estate(id, name, description, thumbnail, address, latitude, longitude, rent, door_height, door_width, features, popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            cur.execute(query, record)
         cnx.commit()
         increment_post_count_estate()
         return {"ok": True}, 201
