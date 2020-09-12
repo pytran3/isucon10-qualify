@@ -340,7 +340,7 @@ def post_estate_nazotte():
         estates = cur.fetchall()
         estates_in_polygon = []
         for estate in estates:
-            query = "SELECT * FROM estate WHERE id = %s AND ST_Contains(ST_PolygonFromText(%s), ST_GeomFromText(%s))"
+            query = "SELECT * FROM estate WHERE id = %s AND ST_Contains(ST_PolygonFromText(%s), ST_GeomFromText(%s)) limit 1"
             polygon_text = (
                 f"POLYGON(({','.join(['{} {}'.format(c['latitude'], c['longitude']) for c in coordinates])}))"
             )
@@ -351,14 +351,8 @@ def post_estate_nazotte():
     finally:
         cnx.close()
 
-    results = {"estates": []}
-    for i, estate in enumerate(estates_in_polygon):
-        if i >= NAZOTTE_LIMIT:
-            break
-        results["estates"].append(camelize(estate))
-    results["count"] = len(results["estates"])
-    return results
-
+    estates = [camelize(estate) for estate in estates_in_polygon[:NAZOTTE_LIMIT]]
+    return {"estates": estates, "count": len(estates)}
 
 @app.route("/api/estate/<int:estate_id>", methods=["GET"])
 def get_estate(estate_id):
