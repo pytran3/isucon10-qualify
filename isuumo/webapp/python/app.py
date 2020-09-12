@@ -399,14 +399,13 @@ def post_chair():
     if "chairs" not in flask.request.files:
         raise BadRequest()
     records = csv.reader(StringIO(flask.request.files["chairs"].read().decode()))
-    records['negative_popularity'] = -1 * records['popularity']
     cnx = cnxpool.connect()
     try:
         cnx.start_transaction()
         cur = cnx.cursor()
         for record in records:
             query = "INSERT INTO chair(id, name, description, thumbnail, price, height, width, depth, color, features, kind, popularity, stock, negative_popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            cur.execute(query, record)
+            cur.execute(query, record + [-1 * record[-2], ])
         cnx.commit()
         return {"ok": True}, 201
     except Exception as e:
@@ -421,14 +420,13 @@ def post_estate():
     if "estates" not in flask.request.files:
         raise BadRequest()
     records = csv.reader(StringIO(flask.request.files["estates"].read().decode()))
-    records['negative_popularity'] = -1 * records['popularity']
     cnx = cnxpool.connect()
     try:
         cnx.start_transaction()
         cur = cnx.cursor()
         for record in records:
             query = "INSERT INTO estate(id, name, description, thumbnail, address, latitude, longitude, rent, door_height, door_width, features, popularity, negative_popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            cur.execute(query, record)
+            cur.execute(query, record + [-1 * record[-1], ])
         cnx.commit()
         increment_post_count_estate()
         return {"ok": True}, 201
