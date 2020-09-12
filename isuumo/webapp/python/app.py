@@ -164,14 +164,15 @@ def get_chair_search():
 
     search_condition = " AND ".join(conditions)
 
-    # query = f"SELECT COUNT(*) as count FROM chair WHERE {search_condition}"
-    # count = select_row(query, params)["count"]
-
     query = f"SELECT * FROM chair WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
     chairs = select_all(query, params + [per_page, per_page * page])
     camelized = camelize(chairs)
+    count = len(camelized)
 
-    return {"count": len(camelized), "chairs": camelized}
+    if count == per_page:
+        query = f"SELECT COUNT(1) as count FROM chair WHERE {search_condition}"
+        count = select_row(query, params)["count"]
+    return {"count": count, "chairs": camelized}
 
 
 @app.route("/api/chair/search/condition", methods=["GET"])
@@ -276,14 +277,15 @@ def get_estate_search():
 
     search_condition = " AND ".join(conditions)
 
-    # query = f"SELECT COUNT(*) as count FROM estate WHERE {search_condition}"
-    # count = select_row(query, params)["count"]
-
     query = f"SELECT * FROM estate WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
-    chairs = select_all(query, params + [per_page, per_page * page])
-    camelized = camelize(chairs)
+    estates = select_all(query, params + [per_page, per_page * page])
+    camelized = camelize(estates)
+    count = len(camelized)
 
-    return {"count": len(camelized), "estates": camelized}
+    if count == per_page:
+        query = f"SELECT COUNT(1) as count FROM estate WHERE {search_condition}"
+        count = select_row(query, params)["count"]
+    return {"count": count, "estates": camelized}
 
 
 @app.route("/api/estate/search/condition", methods=["GET"])
