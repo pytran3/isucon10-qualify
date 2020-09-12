@@ -324,20 +324,20 @@ def post_estate_nazotte():
     cnx = cnxpool.connect()
     try:
         cur = cnx.cursor(dictionary=True)
-        cur.execute(
-            (
-                "SELECT * FROM estate"
-                " WHERE latitude <= %s AND latitude >= %s AND longitude <= %s AND longitude >= %s"
-                " ORDER BY popularity DESC, id ASC"
-            ),
-            (
-                bounding_box["bottom_right_corner"]["latitude"],
-                bounding_box["top_left_corner"]["latitude"],
-                bounding_box["bottom_right_corner"]["longitude"],
-                bounding_box["top_left_corner"]["longitude"],
-            ),
-        )
-        estates = cur.fetchall()
+        # cur.execute(
+        #     (
+        #         "SELECT * FROM estate"
+        #         " WHERE latitude <= %s AND latitude >= %s AND longitude <= %s AND longitude >= %s"
+        #         " ORDER BY popularity DESC, id ASC"
+        #     ),
+        #     (
+        #         bounding_box["bottom_right_corner"]["latitude"],
+        #         bounding_box["top_left_corner"]["latitude"],
+        #         bounding_box["bottom_right_corner"]["longitude"],
+        #         bounding_box["top_left_corner"]["longitude"],
+        #     ),
+        # )
+        # estates = cur.fetchall()
         # estates_in_polygon = []
         # for estate in estates:
         #     query = "SELECT * FROM estate WHERE id = %s AND ST_Contains(ST_PolygonFromText(%s), ST_GeomFromText(%s)) limit 1"
@@ -348,11 +348,14 @@ def post_estate_nazotte():
         #     cur.execute(query, (estate["id"], polygon_text, geom_text))
         #     if len(cur.fetchall()) > 0:
         #         estates_in_polygon.append(estate)
-        query = "SELECT * FROM estate WHERE id in (" + ",".join([str(e["id"]) for e in estates]) + ") AND ST_Contains(ST_PolygonFromText(%s), POINT(latitude, longitude)) ORDER BY popularity DESC, id ASC"
+        query = "SELECT * FROM estate WHERE latitude <= %s AND latitude >= %s AND longitude <= %s AND longitude >= %s AND ST_Contains(ST_PolygonFromText(%s), POINT(latitude, longitude)) ORDER BY popularity DESC, id ASC"
         polygon_text = (
             f"POLYGON(({','.join(['{} {}'.format(c['latitude'], c['longitude']) for c in coordinates])}))"
         )
-        cur.execute(query, (polygon_text, ))
+        cur.execute(query, (    bounding_box["bottom_right_corner"]["latitude"],
+                                bounding_box["top_left_corner"]["latitude"],
+                                bounding_box["bottom_right_corner"]["longitude"],
+                                bounding_box["top_left_corner"]["longitude"],polygon_text, ))
         estates_in_polygon = cur.fetchall()
     finally:
         cnx.close()
