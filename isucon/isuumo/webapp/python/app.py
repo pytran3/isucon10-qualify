@@ -276,13 +276,14 @@ def get_estate_search():
 
     search_condition = " AND ".join(conditions)
 
-    query = f"SELECT COUNT(*) as count FROM estate WHERE {search_condition}"
-    count = select_row(query, params)["count"]
+    # query = f"SELECT COUNT(*) as count FROM estate WHERE {search_condition}"
+    # count = select_row(query, params)["count"]
 
     query = f"SELECT * FROM estate WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
     chairs = select_all(query, params + [per_page, per_page * page])
+    camelized = camelize(chairs)
 
-    return {"count": count, "estates": camelize(chairs)}
+    return {"count": len(camelized), "estates": camelized}
 
 
 @app.route("/api/estate/search/condition", methods=["GET"])
