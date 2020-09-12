@@ -348,7 +348,7 @@ def post_estate_nazotte():
         #     cur.execute(query, (estate["id"], polygon_text, geom_text))
         #     if len(cur.fetchall()) > 0:
         #         estates_in_polygon.append(estate)
-        query = "SELECT * FROM estate WHERE id in (" + ",".join([str(e["id"]) for e in estates]) + ") AND ST_Contains(ST_PolygonFromText(%s), POINT(latitude, longitude))"
+        query = "SELECT * FROM estate WHERE id in (" + ",".join([str(e["id"]) for e in estates]) + ") AND ST_Contains(ST_PolygonFromText(%s), POINT(latitude, longitude)) ORDER BY popularity DESC, id ASC"
         polygon_text = (
             f"POLYGON(({','.join(['{} {}'.format(c['latitude'], c['longitude']) for c in coordinates])}))"
         )
