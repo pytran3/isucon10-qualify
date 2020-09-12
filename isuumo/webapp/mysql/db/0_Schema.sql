@@ -22,7 +22,8 @@ CREATE TABLE isuumo.estate
     INDEX estate_index_1(latitude, longitude),
     INDEX estate_index_2(door_height, door_width),
     INDEX estate_index_3(rent),
-    INDEX estate_index_4(popularity)
+    INDEX estate_index_4(popularity),
+    INDEX estate_index_5(negative_popularity)
 );
 
 CREATE TABLE isuumo.chair
@@ -46,5 +47,6 @@ CREATE TABLE isuumo.chair
     INDEX chair_index_3(stock),
     INDEX chair_index_4(popularity),
     INDEX chair_index_5(color),
-    INDEX chair_index_6(kind)
+    INDEX chair_index_6(kind),
+    INDEX chair_index_7(negative_popularity)
 );
