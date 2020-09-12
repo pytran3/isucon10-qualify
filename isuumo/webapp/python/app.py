@@ -150,7 +150,7 @@ def get_chair_search():
 
     if args.get("features"):
         for feature_confition in args.get("features").split(","):
-            conditions.append("MATCH(full_features) AGAINST('%s')")
+            conditions.append("MATCH(features) AGAINST('%s')")
             params.append(feature_confition)
 
     if len(conditions) == 0:
@@ -265,7 +265,7 @@ def get_estate_search():
 
     if args.get("features"):
         for feature_confition in args.get("features").split(","):
-            conditions.append("MATCH(full_features) AGAINST('%s')")
+            conditions.append("MATCH(features) AGAINST('%s')")
             params.append(feature_confition)
 
     if len(conditions) == 0:
