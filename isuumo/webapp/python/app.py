@@ -27,6 +27,9 @@ mysql_connection_env = {
 
 cnxpool = QueuePool(lambda: mysql.connector.connect(**mysql_connection_env), pool_size=10)
 
+post_count_chair = 0
+post_count_estate = 0
+
 
 def select_all(query, *args, dictionary=True):
     cnx = cnxpool.connect()
@@ -60,9 +63,12 @@ def post_initialize():
 
 
 @app.route("/api/estate/low_priced", methods=["GET"])
-def get_estate_low_priced():
-    rows = select_all("SELECT * FROM estate ORDER BY rent ASC, id ASC LIMIT %s", (LIMIT,))
-    return {"estates": camelize(rows)}
+def get_estate_low_priced(last_post_count=[-1], cache=[]):
+    if last_post_count != post_count_estate:
+        rows = select_all("SELECT * FROM estate ORDER BY rent ASC, id ASC LIMIT %s", (LIMIT,))
+        cache[0] = camelize(rows)
+        last_post_count[0] = post_count_estate
+    return {"estates":cache[0]}
 
 
 @app.route("/api/chair/low_priced", methods=["GET"])
@@ -375,6 +381,13 @@ def get_recommended_estate(chair_id):
         " ORDER BY popularity DESC, id ASC"
         " LIMIT %s"
     )
+    query = (
+        "SELECT * FROM estate"
+        " WHERE (door_width >= %s AND door_height >= %s)"
+        "    OR (door_width >= %s AND door_height >= %s)"
+        " ORDER BY popularity DESC, id ASC"
+        " LIMIT %s"
+    )
     a, b, _ = sorted([w, h, d])
     estates = select_all(query, (a, b, b, a,
                                  LIMIT))
@@ -415,6 +428,7 @@ def post_estate():
             query = "INSERT INTO estate(id, name, description, thumbnail, address, latitude, longitude, rent, door_height, door_width, features, popularity) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             cur.execute(query, record)
         cnx.commit()
+        increment_post_count_estate()
         return {"ok": True}, 201
     except Exception as e:
         cnx.rollback()
@@ -422,6 +436,15 @@ def post_estate():
     finally:
         cnx.close()
 
+
+def increment_post_count_estate():
+    global post_count_estate
+    post_count_estate += 1
+
+
+def increment_post_count_chair():
+    global post_count_chair
+    post_count_chair += 1
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=getenv("SERVER_PORT", 1323), debug=True, threaded=True)
