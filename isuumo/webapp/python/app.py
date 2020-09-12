@@ -372,16 +372,11 @@ def get_recommended_estate(chair_id):
         "SELECT * FROM estate"
         " WHERE (door_width >= %s AND door_height >= %s)"
         "    OR (door_width >= %s AND door_height >= %s)"
-        "    OR (door_width >= %s AND door_height >= %s)"
-        "    OR (door_width >= %s AND door_height >= %s)"
-        "    OR (door_width >= %s AND door_height >= %s)"
-        "    OR (door_width >= %s AND door_height >= %s)"
         " ORDER BY popularity DESC, id ASC"
         " LIMIT %s"
     )
-    estates = select_all(query, (w, h, w, d,
-                                 h, w, h, d,
-                                 d, w, d, h,
+    a, b, _ = sorted([w, h, d])
+    estates = select_all(query, (a, b, b, a,
                                  LIMIT))
     return {"estates": camelize(estates)}
 
