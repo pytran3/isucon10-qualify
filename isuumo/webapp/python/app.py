@@ -63,7 +63,7 @@ def post_initialize():
 
 
 @app.route("/api/estate/low_priced", methods=["GET"])
-def get_estate_low_priced(last_post_count=[-1], cache=[]):
+def get_estate_low_priced(last_post_count=[-1], cache=[None]):
     if last_post_count != post_count_estate:
         rows = select_all("SELECT * FROM estate ORDER BY rent ASC, id ASC LIMIT %s", (LIMIT,))
         cache[0] = camelize(rows)
