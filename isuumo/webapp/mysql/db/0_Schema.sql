@@ -44,9 +44,9 @@ CREATE TABLE isuumo.chair
     INDEX chair_index_1(height),
     INDEX chair_index_2(width),
     INDEX chair_index_3(depth),
-    INDEX chair_index_2(price),
-    INDEX chair_index_3(stock),
-    INDEX chair_index_4(popularity),
-    INDEX chair_index_5(color),
-    INDEX chair_index_6(kind)
+    INDEX chair_index_4(price),
+    INDEX chair_index_5(stock),
+    INDEX chair_index_6(popularity),
+    INDEX chair_index_7(color),
+    INDEX chair_index_8(kind)
 );
