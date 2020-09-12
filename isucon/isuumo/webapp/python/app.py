@@ -169,8 +169,9 @@ def get_chair_search():
 
     query = f"SELECT * FROM chair WHERE {search_condition} ORDER BY popularity DESC, id ASC LIMIT %s OFFSET %s"
     chairs = select_all(query, params + [per_page, per_page * page])
+    camelized = camelize(chairs)
 
-    return {"count": len(charis), "chairs": camelize(chairs)}
+    return {"count": len(camelize), "chairs": camelized}
 
 
 @app.route("/api/chair/search/condition", methods=["GET"])
